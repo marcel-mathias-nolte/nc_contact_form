@@ -1,0 +1,11 @@
+Eine neue Nachricht wurde über das Kontaktformular auf <?php echo $this->domain; ?> übermittelt:
+
+Absender: <?php echo $this->name; ?>&lt;<?php echo $this->email; ?>&gt;
+
+Telefonnr.: <?php echo $this->phone; ?> 
+
+Zeitpunkt: <?php echo $this->date; ?> (von IP <?php echo $this->ip; ?>)
+
+-----------------------------------------------------------------------------------------------
+
+<?php echo $this->message; ?>
