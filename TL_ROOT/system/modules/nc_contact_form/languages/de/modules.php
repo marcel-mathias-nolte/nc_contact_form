@@ -28,5 +28,3 @@ $GLOBALS['TL_LANG']['MOD']['ncContactForm'] = array('Kontaktformular', 'Übermit
  */
 $GLOBALS['TL_LANG']['FMD']['forms']         = 'Formulare';
 $GLOBALS['TL_LANG']['FMD']['ncContactForm'] = array('Kontaktformular', 'Stellt ein Kontaktformular dar.');
-
-?>

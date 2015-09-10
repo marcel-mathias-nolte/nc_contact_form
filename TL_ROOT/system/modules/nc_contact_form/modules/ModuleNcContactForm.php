@@ -25,7 +25,7 @@ namespace NC;
  * @author    Marcel Mathias Nolte
  * @copyright Marcel Mathias Nolte 2013
  */
-class ModuleNcContactForm extends Module
+class ModuleNcContactForm extends \Module
 {
 
 	/**
@@ -43,7 +43,7 @@ class ModuleNcContactForm extends Module
 	{
 		if (TL_MODE == 'BE')
 		{
-			$objTemplate = new BackendTemplate('be_wildcard');
+			$objTemplate = new \BackendTemplate('be_wildcard');
 			$objTemplate->wildcard = '### CONTACT FORM ###';
 			return $objTemplate->parse();
 		}
