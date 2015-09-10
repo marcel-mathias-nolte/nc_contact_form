@@ -1,0 +1,26 @@
+
+<?php $this->extend('block_searchable'); ?>
+
+<?php $this->block('content'); ?>
+
+<form action="<?php echo $this->action; ?>" id="<?php echo $this->formId; ?>" method="post" enctype="<?php echo $this->enctype; ?>">
+	<div class="formbody">
+		<input type="hidden" name="FORM_SUBMIT" value="<?php echo $this->formId; ?>">
+		<input type="hidden" name="REQUEST_TOKEN" value="{{request_token}}">
+		<div class="fields">
+			<?php echo $this->fields; ?>
+		</div>
+		<div class="submit_container">
+			<input type="submit" class="submit" value="<?php echo $this->slabel; ?>">
+		</div>
+	</div>
+</form>
+<?php if ($this->hasError): ?>
+<script>
+	try {
+		window.scrollTo(null, ($('<?php echo $this->formId; ?>').getElement('p.error').getPosition().y - 20));
+	} catch(e) {}
+</script>
+<?php endif; ?>
+
+<?php $this->endblock(); ?>
