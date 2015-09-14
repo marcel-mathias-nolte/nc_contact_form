@@ -7,7 +7,7 @@
  * 
  * @package   NC Contact Form
  * @author    Marcel Mathias Nolte
- * @copyright Marcel Mathias Nolte 2013
+ * @copyright Marcel Mathias Nolte 2015
  * @website	  https://www.noltecomputer.com
  * @license   <marcel.nolte@noltecomputer.de> wrote this file. As long as you retain this notice you
  *            can do whatever you want with this stuff. If we meet some day, and you think this stuff 
@@ -136,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form'] = array
  * Class tl_nc_contact_form
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright Marcel Mathias Nolte 2013
+ * @copyright Marcel Mathias Nolte 2015
  * @author    Marcel Mathias Nolte
  * @package   NC Contact Form
  */
