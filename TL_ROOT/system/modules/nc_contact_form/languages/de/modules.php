@@ -20,7 +20,7 @@
  * Back end modules
  */
 $GLOBALS['TL_LANG']['MOD']['messages']      = array('Benachrichtigungen', 'Benachrichtigungen aus verschiedenen Quellen.');
-$GLOBALS['TL_LANG']['MOD']['ncContactForm'] = array('Kontaktformular', 'Übermittelte Nachrichten anzeigen.');
+$GLOBALS['TL_LANG']['MOD']['ncContactForm'] = array('Kontaktformular (' . ModuleNcContactFormHelper::getInstance()->getUnreadCount() . ')', 'Übermittelte Nachrichten anzeigen.');
 
 
 /**

@@ -20,14 +20,12 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_nc_contact_form']['title']   = array('Bezeichnung', 'Bezeichnung für das Kontaktformular.');
-$GLOBALS['TL_LANG']['tl_nc_contact_form']['mailto']  = array('E-Mail-Empfänger', 'Kommagetrennte Liste der E-Mail-Empfänger.');
 
 
 /**
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_nc_contact_form']['title_legend']  = 'Titel';
-$GLOBALS['TL_LANG']['tl_nc_contact_form']['config_legend'] = 'Einstellungen';
 
 
 /**
