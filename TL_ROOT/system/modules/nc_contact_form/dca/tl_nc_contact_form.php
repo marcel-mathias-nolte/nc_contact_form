@@ -50,8 +50,8 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form'] = array
         ),
         'label' => array
         (
-            'fields'                  => array('title', 'id'),
-            'format'                  => '%s <span style="color:#b3b3b3; padding-left:3px;">[%s]</span>'
+			'fields'                  => array('id'),
+            'label_callback'          => array('tl_nc_contact_form', 'getLabel')
         ),
         'global_operations' => array
         (
@@ -102,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => '{title_legend},title;{config_legend},mailto;',
+		'default'                     => '{title_legend},title;',
 	),
 
 
@@ -127,17 +127,6 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'long'),
 			'sql'                     => "varchar(128) COLLATE utf8_bin NOT NULL default ''"
-		),
-		'mailto' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form']['mailto'],
-			'exclude'                 => true,
-			'search'                  => true,
-			'sorting'                 => true,
-			'flag'                    => 1,
-			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'tl_class'=>'long'),
-			'sql'                     => "varchar(255) COLLATE utf8_bin NOT NULL default ''"
 		)
 	)
 );
@@ -161,6 +150,17 @@ class tl_nc_contact_form extends Backend
 	{
 		parent::__construct();
 		$this->import('BackendUser', 'User');
+	}
+	
+
+	/**
+	 * Generate item label
+	 * @return array
+	 */
+	public function getLabel($arrRow)
+	{
+		$count = $this->Database->prepare("SELECT COUNT(*) AS count FROM tl_nc_contact_form_messages WHERE pid=? AND messageRead=''")->execute($arrRow['id'])->next()->count;
+		return sprintf('%s (%u)<span style="color:#b3b3b3; padding-left:3px;">[%u]</span>', $arrRow['title'], $count, $arrRow['id']);
 	}
 
 }

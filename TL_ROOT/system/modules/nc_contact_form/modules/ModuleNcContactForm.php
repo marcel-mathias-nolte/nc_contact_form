@@ -7,7 +7,7 @@
  * 
  * @package   NC Contact Form
  * @author    Marcel Mathias Nolte
- * @copyright Marcel Mathias Nolte 2013
+ * @copyright Marcel Mathias Nolte 2015
  * @website	  https://www.noltecomputer.com
  * @license   <marcel.nolte@noltecomputer.de> wrote this file. As long as you retain this notice you
  *            can do whatever you want with this stuff. If we meet some day, and you think this stuff 
@@ -48,10 +48,6 @@ class ModuleNcContactForm extends \Module
 			return $objTemplate->parse();
 		}
 		$this->fields = @unserialize($this->nc_contact_form_fields);
-		$strScriptfile = 'system/modules/nc_contact_form/assets/default.js';
-		if (!in_array($strScriptfile, $GLOBALS['TL_JAVASCRIPT'])) {
-			$GLOBALS['TL_JAVASCRIPT'][] = $strScriptfile;
-		}
 		return parent::generate();
 	}
 	
@@ -270,18 +266,23 @@ class ModuleNcContactForm extends \Module
 	protected function saveMessage($arrData)
 	{
 		$arrData['tstamp'] = time();
-		$arrData['date'] = date("d.m.Y H:i");
+		$arrData['date'] = date($GLOBALS['TL_CONFIG']['datimFormat']);
 		$arrData['ip'] = $_SERVER['REMOTE_ADDR'];
-		$arrData['pid'] = $this->contact_form;
+		$arrData['pid'] = $this->nc_contact_form;
+		if (!in_array('name', $this->fields) && in_array('firstname', $this->fields) && in_array('lastname', $this->fields)) {
+			$arrData['name'] = $arrData['firstname'] . ' ' . $arrData['lastname'];
+		} else if (in_array('name', $this->fields) && !in_array('firstname', $this->fields) && !in_array('lastname', $this->fields)) {
+			$tmp = explode(' ', $arrData['name']);
+			$arrData['lastname'] = array_pop($tmp);
+			$arrData['firstname'] = implode(' ', $tmp);
+		}
 		unset($arrData['captcha']);
 		unset($arrData['label']);
-
-		$arrChunks = array();
-		// Create message
 		$objNewMessage = $this->Database->prepare("INSERT INTO tl_nc_contact_form_messages %s")->set($arrData)->execute();
 		$insertId = $objNewMessage->insertId;
-
-		// Inform admin 
+		if ($this->Database->tableExists('tl_nc_notifications')) {
+			$this->Database->prepare("INSERT INTO tl_nc_notifications (tstamp, sid, source, href) VALUES (?, ?, ?, ?)")->execute($arrData['tstamp'], $insertId, 'tl_nc_contact_form_messages', 'main.php?do=ncContactForm&table=tl_nc_contact_form_messages&act=show&id=' . $insertId);
+		}
 		$this->sendAdminNotification($insertId, $arrData);
 		$this->jumpToOrReload($this->jumpTo);
 	}
@@ -293,25 +294,51 @@ class ModuleNcContactForm extends \Module
 	 */
 	protected function sendAdminNotification($intId, $arrData)
 	{
+		$token = array(
+			'###domain###' => $this->Environment->host
+		);
+		foreach ($arrData as $key => $value) {
+			$token['###' . $key . '###'] = $value;
+		}
+		
 		$objEmail = new \Email();
-
-		$objEmail->from = $GLOBALS['TL_ADMIN_EMAIL'];
-		$objEmail->fromName = $GLOBALS['TL_ADMIN_NAME'];
-		$objEmail->subject = 'Eine neue Nachricht wurde über das Kontaktformular auf ' . $this->Environment->host . ' übermittelt.';
-
-		$strData = sprintf("\n\nEine neue Nachricht wurde über das Kontaktformular übermittelt:\n\nAbsender: %s <%s>\n\nTelefonnr.: %s\n\nZeitpunkt: %s (von IP %s)\n\nNachricht:\n\n%s\n\n", $arrData['name'] , $arrData['email'], $arrData['phone'], $arrData['date'], $arrData['ip'], $arrData['message']);
-
-		$objEmail->text = $strData; //sprintf($GLOBALS['TL_LANG']['MSC']['adminText'], $intId, $strData . "\n") . "\n";
-		$blnSend = false;
-		$strMailTo = $this->Database->prepare("SELECT mailto FROM tl_nc_contact_form WHERE id=?")->limit(1)->execute($this->nc_contact_form)->next()->mailto;
-		foreach (explode(',', $strMailTo) as $strRecipient) {
-			if (trim($strRecipient) != '') {
-				$objEmail->sendTo($strRecipient);
-				$blnSend = true;
+		
+		if ($this->nc_contact_form_mail_admin) {
+			if ($this->nc_contact_form_mail_admin_original_sender) {
+				$objEmail->from = $arrData['email'];
+				$objEmail->fromName = $arrData['name'];
+			} else {
+				$objEmail->from = $GLOBALS['TL_ADMIN_EMAIL'];
+				$objEmail->fromName = $GLOBALS['TL_ADMIN_NAME'];
+			}
+			$objEmail->subject = strtr(html_entity_decode($this->nc_contact_form_mail_admin_subject), $token);
+			$objEmail->text = strtr($this->nc_contact_form_mail_admin_text, $token);
+			$blnSend = false;
+			$strMailTo = $this->nc_contact_form_mail_admin_address;
+			foreach (explode(',', $strMailTo) as $strRecipient) {
+				if (trim($strRecipient) != '') {
+					$objEmail->sendTo($strRecipient);
+					$blnSend = true;
+				}
+			}
+			if (!$blnSend) {
+				$objEmail->sendTo($GLOBALS['TL_ADMIN_EMAIL']);
 			}
 		}
-		if ($blnSend) {
-			$objEmail->sendTo($GLOBALS['TL_ADMIN_EMAIL']);
+		
+		if ($this->nc_contact_form_mail_user) {
+			if ($this->nc_contact_form_mail_user_original_sender) {
+				$objEmail->from = $arrData['email'];
+				$objEmail->fromName = $arrData['name'];
+			} else {
+				$objEmail->from = $GLOBALS['TL_ADMIN_EMAIL'];
+				$objEmail->fromName = $GLOBALS['TL_ADMIN_NAME'];
+			}
+			$objEmail->subject = strtr(html_entity_decode($this->nc_contact_form_mail_user_subject), $token);
+			$objEmail->text = strtr($this->nc_contact_form_mail_user_text, $token);
+			$blnSend = false;
+			$strMailTo = trim($arrData['email']);
+			$objEmail->sendTo($strMailTo);
 		}
 	}	
 }

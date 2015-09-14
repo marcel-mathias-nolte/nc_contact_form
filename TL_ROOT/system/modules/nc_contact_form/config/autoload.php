@@ -7,7 +7,7 @@
  * 
  * @package   NC Contact Form
  * @author    Marcel Mathias Nolte
- * @copyright Marcel Mathias Nolte 2013
+ * @copyright Marcel Mathias Nolte 2015
  * @website	  https://www.noltecomputer.com
  * @license   <marcel.nolte@noltecomputer.de> wrote this file. As long as you retain this notice you
  *            can do whatever you want with this stuff. If we meet some day, and you think this stuff 
@@ -30,6 +30,8 @@ ClassLoader::addNamespaces(array
  */
 ClassLoader::addClasses(array
 (
+	// Classes
+	'NC\\ModuleNcContactFormHelper'   => 'system/modules/nc_contact_form/classes/ModuleNcContactFormHelper.php',
 	// Modules
 	'NC\\ModuleNcContactForm'         => 'system/modules/nc_contact_form/modules/ModuleNcContactForm.php',
 ));

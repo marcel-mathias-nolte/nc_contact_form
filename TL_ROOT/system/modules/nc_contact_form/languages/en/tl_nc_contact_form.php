@@ -20,14 +20,12 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_nc_contact_form']['title']   = array('Title', 'Title for the contact form.');
-$GLOBALS['TL_LANG']['tl_nc_contact_form']['mailto']  = array('Email recipients', 'Comma seperated list of email recipients.');
 
 
 /**
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_nc_contact_form']['title_legend']  = 'Title';
-$GLOBALS['TL_LANG']['tl_nc_contact_form']['config_legend'] = 'Settings';
 
 
 /**

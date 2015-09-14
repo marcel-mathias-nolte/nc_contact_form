@@ -7,7 +7,7 @@
  * 
  * @package   NC Contact Form
  * @author    Marcel Mathias Nolte
- * @copyright Marcel Mathias Nolte 2013
+ * @copyright Marcel Mathias Nolte 2015
  * @website	  https://www.noltecomputer.com
  * @license   <marcel.nolte@noltecomputer.de> wrote this file. As long as you retain this notice you
  *            can do whatever you want with this stuff. If we meet some day, and you think this stuff 
@@ -30,10 +30,6 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
 		'closed'                      => true,
 		'notEditable'                 => true,
         'ptable'                      => 'tl_nc_contact_form',
-		'onsubmit_callback' => array
-		(
-			array('tl_nc_contact_form_messages', 'storeDateAdded')
-		),
 		'sql' => array
 		(
 			'keys' => array
@@ -54,7 +50,7 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
 			'fields'                  => array('tstamp'),
 			'panelLayout'             => 'search,filter,limit',
 			'headerFields'            => array('title'),
-			'child_record_callback'   => array('tl_nc_contact_form_messages', 'listMessages')
+			'child_record_callback'   => array('tl_nc_contact_form_messages', 'getLabel')
         ),
         'label' => array
         (
@@ -64,6 +60,13 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
         'global_operations' => array(),
         'operations' => array
         (
+			'markMessageRead' => array
+			(
+				'label'               => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['markMessageRead'],
+				'icon'                => 'system/modules/nc_contact_form/assets/unread.png',
+				'attributes'          => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleNcContactFormRead(this,%s)"',
+				'button_callback'     => array('tl_nc_contact_form_messages', 'getReadIcon')
+			),
             'delete' => array
             (
                 'label'               => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['delete'],
@@ -83,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
 	// Palettes
 	'palettes' => array
 	(
-		'default'                     => '{sender_legend},name,email,phone,message;{data_legend:hide},date,ip',
+		'default'                     => '{sender_legend},name,gender,firstname,lastname,street,postal,city,callRequest,email,phone,message;{data_legend:hide},date,ip',
 	),
 
 
@@ -114,6 +117,72 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
 			'inputType'               => 'text',
 			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
 			'sql'                     => "varchar(255) NOT NULL default ''"
+		),
+		'gender' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['gender'],
+			'exclude'                 => true,
+			'inputType'               => 'select',
+			'options'                 => array('male', 'female'),
+			'reference'               => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['gender'],
+			'eval'                    => array('includeBlankOption'=>true, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
+			'sql'                     => "varchar(32) NOT NULL default ''"
+		),
+		'firstname' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['firstname'],
+			'exclude'                 => true,
+			'search'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'text',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
+		),
+		'lastname' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['lastname'],
+			'exclude'                 => true,
+			'search'                  => true,
+			'flag'                    => 1,
+			'inputType'               => 'text',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
+		),
+		'street' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['street'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
+		),
+		'postal' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['postal'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'search'                  => true,
+			'inputType'               => 'text',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>32, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
+			'sql'                     => "varchar(32) NOT NULL default ''"
+		),
+		'city' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['city'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'search'                  => true,
+			'inputType'               => 'text',
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>255, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address', 'tl_class'=>'w50'),
+			'sql'                     => "varchar(255) NOT NULL default ''"
+		),
+		'callRequest' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['callRequest'],
+			'exclude'                 => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class'=>'clr', 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'address'),
+			'sql'                     => "char(1) NOT NULL default ''"
 		),
 		'phone' => array
 		(
@@ -147,9 +216,8 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
 			'exclude'                 => true,
 			'search'                  => true,
 			'sorting'                 => true,
-			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>17, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>17, 'tl_class'=>'w50'),
 			'sql'                     => "varchar(32) NOT NULL default ''"
 		),
 		'ip' => array
@@ -160,18 +228,27 @@ $GLOBALS['TL_DCA']['tl_nc_contact_form_messages'] = array
 			'sorting'                 => true,
 			'flag'                    => 1,
 			'inputType'               => 'text',
-			'eval'                    => array('mandatory'=>true, 'maxlength'=>15, 'feEditable'=>true, 'feViewable'=>true, 'feGroup'=>'personal', 'tl_class'=>'w50'),
+			'eval'                    => array('mandatory'=>true, 'maxlength'=>15, 'tl_class'=>'w50'),
 			'sql'                     => "varchar(32) NOT NULL default ''"
 		),
+		'messageRead' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['messageRead'],
+			'exclude'                 => true,
+			'inputType'               => 'checkbox',
+			'eval'                    => array('tl_class'=>'clr'),
+			'sql'                     => "char(1) NOT NULL default ''"
+		)
 	)
 );
+
 
 
 /**
  * Class tl_nc_contact_form_messages
  *
  * Provide miscellaneous methods that are used by the data configuration array.
- * @copyright Marcel Mathias Nolte 2013
+ * @copyright Marcel Mathias Nolte 2015
  * @author    Marcel Mathias Nolte
  * @package   NC Contact Form
  */
@@ -186,31 +263,48 @@ class tl_nc_contact_form_messages extends Backend
 		parent::__construct();
 		$this->import('BackendUser', 'User');
 	}
-
-
-	/**
-	 * Store the date when the account has been added
-	 * @param DataContainer
-	 */
-	public function storeDateAdded(DataContainer $dc)
-	{
-		// Return if there is no active record (override all)
-		if (!$dc->activeRecord || !empty($dc->activeRecord->date))
-		{
-			return;
-		}
-
-		$this->Database->prepare("UPDATE tl_nc_contact_form_messages SET date=? WHERE id=?")
-					   ->execute(date("d.m.Y H:i"), $dc->id);
-	}
 	
 
 	/**
-	 * Return all surveys as array
+	 * Return the item label
 	 * @return array
 	 */
-	public function listMessages($arrRow)
+	public function getLabel($arrRow)
 	{
-		return sprintf("%s&lt;%s&gt; am %s", $arrRow['name'], $arrRow['email'], $arrRow['date']);
+		$token = array(
+			'###contact_form###' => $this->Database->prepare("SELECT title FROM tl_nc_contact_form WHERE id=?")->execute($arrRow['pid'])->next()->title,
+			'###fmt###' => !$arrRow['messageRead'] ? 'strong' : 'i'
+		);
+		foreach ($arrRow as $key => $value) {
+			$token['###' . $key . '###'] = $value;
+		}
+		return strtr($GLOBALS['TL_LANG']['tl_nc_contact_form_messages']['label'], $token);
+	}
+
+
+	/**
+	 * Return the "toggle read" button
+	 *
+	 * @param array  $row
+	 * @param string $href
+	 * @param string $label
+	 * @param string $title
+	 * @param string $icon
+	 * @param string $attributes
+	 *
+	 * @return string
+	 */
+	public function getReadIcon($row, $href, $label, $title, $icon, $attributes)
+	{
+		if (!$this->User->hasAccess('tl_nc_contact_form_messages::messageRead', 'alexf'))
+		{
+			return '';
+		}
+		$href .= '&amp;item='.$row['id'].'&amp;read_state='.$row['messageRead'];
+		if ($row['messageRead'])
+		{
+			$icon = 'system/modules/nc_contact_form/assets/read.png';
+		}
+		return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
 	}
 }
